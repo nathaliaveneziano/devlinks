@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { signInWithEmailAndPassword } from 'firebase/auth';
+import { toast } from 'react-toastify';
 import { Logo } from '../../components/Logo';
 import { auth } from '../../services/firebaseConnection';
 import './login.css';
@@ -14,17 +15,17 @@ export default function Login() {
     e.preventDefault();
 
     if (email === '' || password === '') {
-      alert('Preencha todos os campos!');
+      toast.warn('Preencha todos os campos!');
       return;
     }
 
     signInWithEmailAndPassword(auth, email, password)
       .then(() => {
-        console.log('usuario logado com sucesso');
+        toast.success('Bem-vindo(a) de volta! 😍');
         navigate('/admin', { replace: true });
       })
       .catch(() => {
-        console.log('erro de login');
+        toast.error('Erro ao fazer o login. Por favor, verifique os campos!');
       });
   }
 
