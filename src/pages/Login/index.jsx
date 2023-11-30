@@ -48,7 +48,9 @@ export default function Login() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <Button type="submit">Acessar</Button>
+        <Button type="submit" className="form-button">
+          Acessar
+        </Button>
       </form>
     </div>
   );
