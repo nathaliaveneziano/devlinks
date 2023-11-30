@@ -4,6 +4,8 @@ import { FiTrash2 } from 'react-icons/fi';
 import {
   addDoc,
   collection,
+  deleteDoc,
+  doc,
   onSnapshot,
   orderBy,
   query,
@@ -69,6 +71,11 @@ export default function Admin() {
         console.log('Error ao registrar' + error.message);
         toast.error('Ops! Erro ao salvar o link');
       });
+  }
+
+  async function handleDeleteLink(id) {
+    const docRef = doc(db, 'links', id);
+    await deleteDoc(docRef);
   }
 
   return (
@@ -149,7 +156,9 @@ export default function Admin() {
           style={{ backgroundColor: item.background, color: item.color }}>
           <p>{item.name}</p>
           <div>
-            <Button className="delete">
+            <Button
+              className="delete"
+              onClick={() => handleDeleteLink(item.id)}>
               <FiTrash2 size={18} color="#fff" />
             </Button>
           </div>
