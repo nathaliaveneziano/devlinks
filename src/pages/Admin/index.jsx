@@ -1,7 +1,13 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { MdAddLink } from 'react-icons/md';
 import { FiTrash2 } from 'react-icons/fi';
-import { addDoc, collection } from 'firebase/firestore';
+import {
+  addDoc,
+  collection,
+  onSnapshot,
+  orderBy,
+  query,
+} from 'firebase/firestore';
 import { toast } from 'react-toastify';
 import { Header } from '../../components/Header';
 import { Logo } from '../../components/Logo';
@@ -15,6 +21,27 @@ export default function Admin() {
   const [urlInput, setUrlInput] = useState('');
   const [backgroundInput, setBackgroundInput] = useState('#f1f1f1');
   const [colorInput, setColorInput] = useState('#121212');
+  const [links, setLinks] = useState([]);
+
+  useEffect(() => {
+    const linksRef = collection(db, 'links');
+    const queryRef = query(linksRef, orderBy('created', 'asc'));
+    onSnapshot(queryRef, (snapshot) => {
+      let lista = [];
+
+      snapshot.forEach((doc) => {
+        lista.push({
+          id: doc.id,
+          name: doc.data().name,
+          url: doc.data().url,
+          background: doc.data().background,
+          color: doc.data().color,
+        });
+      });
+
+      setLinks(lista);
+    });
+  }, []);
 
   async function handleRegister(e) {
     e.preventDefault();
@@ -115,16 +142,19 @@ export default function Admin() {
 
       <h2 className="title">Meus links</h2>
 
-      <article
-        className="list animate-pop"
-        style={{ backgroundColor: '#000', color: '#fff' }}>
-        <p>Grupo exclusivo no Telegram</p>
-        <div>
-          <Button className="delete">
-            <FiTrash2 size={18} color="#fff" />
-          </Button>
-        </div>
-      </article>
+      {links.map((item, index) => (
+        <article
+          key={index}
+          className="list animate-pop"
+          style={{ backgroundColor: item.background, color: item.color }}>
+          <p>{item.name}</p>
+          <div>
+            <Button className="delete">
+              <FiTrash2 size={18} color="#fff" />
+            </Button>
+          </div>
+        </article>
+      ))}
     </div>
   );
 }
