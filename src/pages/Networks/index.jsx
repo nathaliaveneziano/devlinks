@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { MdAddLink } from 'react-icons/md';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { toast } from 'react-toastify';
 import { Header } from '../../components/Header';
 import { Input } from '../../components/Input';
@@ -13,6 +13,21 @@ export default function Networks() {
   const [instagram, setInstagram] = useState('');
   const [youtube, setYoutube] = useState('');
 
+  useEffect(() => {
+    function loadLinks() {
+      const docRef = doc(db, 'social', 'link');
+      getDoc(docRef).then((snapshot) => {
+        if (snapshot.data()) {
+          setFacebook(snapshot.data().facebook);
+          setInstagram(snapshot.data().instagram);
+          setYoutube(snapshot.data().youtube);
+        }
+      });
+    }
+
+    loadLinks();
+  }, []);
+
   async function handleSave(e) {
     e.preventDefault();
 
@@ -22,10 +37,7 @@ export default function Networks() {
       youtube: youtube,
     })
       .then(() => {
-        setFacebook('');
-        setInstagram('');
-        setYoutube('');
-        toast.success('Link registrado com sucesso!');
+        toast.success('Links registrados com sucesso!');
       })
       .catch((error) => {
         console.log('Error ao registrar' + error.message);
