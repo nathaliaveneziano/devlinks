@@ -1,13 +1,21 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FaFacebook, FaInstagram, FaYoutube } from 'react-icons/fa';
-import { collection, getDocs, orderBy, query } from 'firebase/firestore';
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  orderBy,
+  query,
+} from 'firebase/firestore';
 import { Social } from '../../components/Social';
 import { db } from '../../services/firebaseConnection';
 import './home.css';
 
 export default function Home() {
   const [links, setLinks] = useState([]);
+  const [socialLinks, setSocialLinks] = useState({});
 
   useEffect(() => {
     function loadLinks() {
@@ -30,6 +38,19 @@ export default function Home() {
     loadLinks();
   }, []);
 
+  useEffect(() => {
+    function loadSocialLinks() {
+      const docRef = doc(db, 'social', 'link');
+      getDoc(docRef).then((snapshot) => {
+        if (snapshot.data()) {
+          setSocialLinks(snapshot.data());
+        }
+      });
+    }
+
+    loadSocialLinks();
+  }, []);
+
   return (
     <div className="home">
       <h1>Nathália Veneziano</h1>
@@ -49,17 +70,27 @@ export default function Home() {
           </section>
         ))}
 
-        <footer>
-          <Social url="https://www.facebook.com">
-            <FaFacebook size={35} color="#ffffff" />
-          </Social>
-          <Social url="https://www.youtube.com">
-            <FaYoutube size={35} color="#ffffff" />
-          </Social>
-          <Social url="https://www.instagram.com">
-            <FaInstagram size={35} color="#ffffff" />
-          </Social>
-        </footer>
+        {links.length !== 0 && Object.keys(socialLinks).length > 0 && (
+          <footer>
+            {socialLinks?.facebook && (
+              <Social url={socialLinks.facebook}>
+                <FaFacebook size={35} color="#ffffff" />
+              </Social>
+            )}
+
+            {socialLinks?.youtube && (
+              <Social url={socialLinks.youtube}>
+                <FaYoutube size={35} color="#ffffff" />
+              </Social>
+            )}
+
+            {socialLinks?.instagram && (
+              <Social url={socialLinks.instagram}>
+                <FaInstagram size={35} color="#ffffff" />
+              </Social>
+            )}
+          </footer>
+        )}
       </main>
     </div>
   );
